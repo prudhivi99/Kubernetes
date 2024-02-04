@@ -18,10 +18,10 @@
 ### DaemonSets
 
 ```
-DaemonSet is a Kubernetes controller used for cluster-level operations, ensuring that a specific Pod runs on every node in the cluster.
-It automatically creates a new Pod when a new node is added and terminates it when a node is removed, maintaining the desired state of
-the system. A DaemonSet in Kubernetes is like a chef in a restaurant responsible for preparing a specific dish for every table, ensuring
-consistency and quality in the end result.
+DaemonSet is a Kubernetes controller used for cluster-level operations, ensuring that a specific Pod runs on every node
+in the cluster.It automatically creates a new Pod when a new node is added and terminates it when a node is removed,
+maintaining the desired state ofthe system. A DaemonSet in Kubernetes is like a chef in a restaurant responsible for
+preparing a specific dish for every table, ensuringconsistency and quality in the end result.
 
 ```
 
