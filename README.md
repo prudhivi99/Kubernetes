@@ -18,82 +18,12 @@
 ### DaemonSets
 
 ```
-DaemonSet is a Kubernetes controller used for cluster-level operations, ensuring that a specific Pod runs on every node in the cluster. It automatically creates a new Pod when a new node is added and terminates it when a node is removed, maintaining the desired state of the system. A DaemonSet in Kubernetes is like a chef in a restaurant responsible for preparing a specific dish for every table, ensuring consistency and quality in the end result.
+![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/aeb1be1d-a29d-4a59-8258-0946a512ebc5)
 
+![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/af475caa-7cbb-4c72-8a7a-f24f1afb3ad3)
 
-Kubernetes: DaemonSets
-Table of Contents
+![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/5e3adf92-8f50-4e1f-88aa-ebf15ceca840)
 
-· DaemonSets
-· Short Name: ds
-· DaemonSet with YAML
-· Commands
-DaemonSets
-
-DaemonSets
-DaemonSet is a Kubernetes controller that ensures that a copy of a specific Pod is running on every node in the cluster. It’s typically used for cluster-level operations like logging, monitoring, or other background tasks that need to be performed on every node. When a new node is added to the cluster, the DaemonSet will automatically create a new Pod on that node, and when a node is removed, the DaemonSet will terminate the corresponding Pod. This ensures that the desired state of the system is always maintained, regardless of the cluster’s size or configuration changes.
-
-Analogously, a DaemonSet in Kubernetes can be compared to a chef in a restaurant who is responsible for preparing a specific dish for every table.
-The chef is responsible for maintaining the consistency and quality of the dishes served to customers.
-
-Short Name: ds
-$ kubectl api-resources
-NAME          SHORTNAMES   APIVERSION    NAMESPACED   KIND
-daemonsets    ds           apps/v1       true         DaemonSet
-DaemonSet with YAML
-
-daemonSet with YAML
-daemonSet.yaml
-
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: <deployment_name>
-  labels:
-    <key1>: <value1>
-    <key2>: <value2>
-           :
-           :
-    <keyM>: <valueM>
-spec:
-  selector:
-    matchLabels:
-      <key1>: <value1>
-      <key2>: <value2>
-             :
-             :
-      <keyN>: <valueN>
-  template:
-    # pod template starts here
-    metadata:
-      name: <pod_name>
-      labels:
-        <key1>: <value1>
-        <key2>: <value2>
-               :
-               :
-        <keyN>: <valueN>
-    spec:
-      containers:
-        - name: <container1_name>
-          image: <image>
-        - name: <container2_name>
-          image: <image>
-    # pod template ends here
-Commands
-
-commands
-Create a daemonSet using a YAML file
-$ kubectl create -f <daemonset_name>.yaml
-2. Retrieve a list of all daemonSets in a Kubernetes cluster
-
-$ kubectl get daemonsets
-3. Get detailed information about a specific daemonSet in the Kubernetes cluster
-
-$ kubectl describe daemonsets <daemonset_name>
-4. Delete a daemonSet from the Kubernetes cluster
-
-$ kubectl delete daemonsets <daemonset_name>
 ```
 
 ## 2 Scheduling
