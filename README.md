@@ -25,7 +25,7 @@ nodes are dedicated to run control plane pods.
 ```
 
 
-taint example 
+Q. taint example 
 
 ```
 Create another pod named bee with the nginx image, which has a toleration set to the taint mortein
@@ -51,5 +51,10 @@ spec:
     operator: "Equal"
     effect: "NoSchedule"
 status: {}
+```
+
+```
+Q. Remove the taint on controlplane, which currently has the taint effect of NoSchedule
+kubectl taint node controlplane node-role.kubernetes.io/control-plane:NoSchedule-
 ```
 
