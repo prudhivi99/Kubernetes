@@ -2,13 +2,101 @@
 
 # Table of Contents
 
-- 1 [Scheduling](#Scheduling)
-    - 1.1 [Taints](#taints)
-    - 1.2 [Tolerations](#tolerations)
-    - 1.3 [NodeAffinity](#nodeaffinity)
- 
+- 1 [KubernetsObjects](#Objects)
+    - 1.1 [Pods](#pods)
+    - 1.2 [ReplicaSets](#replicasets)
+    - 1.3 [Deployments](#deployments)
+    - 1.4 [Services](#services)
+    - 1.5 [DaemonSets](#daemonsets)
+    - 
+- 2 [Scheduling](#Scheduling)
+    - 2.1 [Taints](#taints)
+    - 2.2 [Tolerations](#tolerations)
+    - 2.3 [NodeAffinity](#nodeaffinity)
 
-## 1 Scheduling
+## 1 Objects
+### DaemonSets
+
+```
+DaemonSet is a Kubernetes controller used for cluster-level operations, ensuring that a specific Pod runs on every node in the cluster. It automatically creates a new Pod when a new node is added and terminates it when a node is removed, maintaining the desired state of the system. A DaemonSet in Kubernetes is like a chef in a restaurant responsible for preparing a specific dish for every table, ensuring consistency and quality in the end result.
+
+
+Kubernetes: DaemonSets
+Table of Contents
+
+· DaemonSets
+· Short Name: ds
+· DaemonSet with YAML
+· Commands
+DaemonSets
+
+DaemonSets
+DaemonSet is a Kubernetes controller that ensures that a copy of a specific Pod is running on every node in the cluster. It’s typically used for cluster-level operations like logging, monitoring, or other background tasks that need to be performed on every node. When a new node is added to the cluster, the DaemonSet will automatically create a new Pod on that node, and when a node is removed, the DaemonSet will terminate the corresponding Pod. This ensures that the desired state of the system is always maintained, regardless of the cluster’s size or configuration changes.
+
+Analogously, a DaemonSet in Kubernetes can be compared to a chef in a restaurant who is responsible for preparing a specific dish for every table.
+The chef is responsible for maintaining the consistency and quality of the dishes served to customers.
+
+Short Name: ds
+$ kubectl api-resources
+NAME          SHORTNAMES   APIVERSION    NAMESPACED   KIND
+daemonsets    ds           apps/v1       true         DaemonSet
+DaemonSet with YAML
+
+daemonSet with YAML
+daemonSet.yaml
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: <deployment_name>
+  labels:
+    <key1>: <value1>
+    <key2>: <value2>
+           :
+           :
+    <keyM>: <valueM>
+spec:
+  selector:
+    matchLabels:
+      <key1>: <value1>
+      <key2>: <value2>
+             :
+             :
+      <keyN>: <valueN>
+  template:
+    # pod template starts here
+    metadata:
+      name: <pod_name>
+      labels:
+        <key1>: <value1>
+        <key2>: <value2>
+               :
+               :
+        <keyN>: <valueN>
+    spec:
+      containers:
+        - name: <container1_name>
+          image: <image>
+        - name: <container2_name>
+          image: <image>
+    # pod template ends here
+Commands
+
+commands
+Create a daemonSet using a YAML file
+$ kubectl create -f <daemonset_name>.yaml
+2. Retrieve a list of all daemonSets in a Kubernetes cluster
+
+$ kubectl get daemonsets
+3. Get detailed information about a specific daemonSet in the Kubernetes cluster
+
+$ kubectl describe daemonsets <daemonset_name>
+4. Delete a daemonSet from the Kubernetes cluster
+
+$ kubectl delete daemonsets <daemonset_name>
+```
+
+## 2 Scheduling
 ### taints
 
 ```
