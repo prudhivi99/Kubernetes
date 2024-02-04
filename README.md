@@ -94,3 +94,59 @@ spec:
     image: nginx
     imagePullPolicy: IfNotPresent
 ```
+
+see difference b/n nodeAffinity section above and below.
+
+```yaml
+Name: red
+
+Replicas: 2
+
+Image: nginx
+
+NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+
+Key: node-role.kubernetes.io/control-plane
+
+Use the right operator
+
+
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: red
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: red
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+```
+
