@@ -12,6 +12,18 @@
 ### taints
 
 ```
+Taints and tolerations are a mechanism that allows you to ensure that pods are not placed on inappropriate nodes. Taints are added to nodes, while tolerations are defined in the pod specification. When you taint a node, it will repel all the pods except those that have a toleration for that taint. A node can have one or many taints associated with it.
+```
+
+use cases
+```
+For example, most Kubernetes distributions will automatically taint the master nodes so that one of the pods that manages the control plane is scheduled onto them and not any other data plane pods deployed by users. This ensures that the master nodes are dedicated to run control plane pods.
+```
+
+
+taint example 
+
+```
 Create another pod named bee with the nginx image, which has a toleration set to the taint mortein
 ```
 ```yaml
