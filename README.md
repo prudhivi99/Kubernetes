@@ -8,6 +8,7 @@
     - 1.3 [Deployments](#deployments)
     - 1.4 [Services](#services)
     - 1.5 [DaemonSets](#daemonsets)
+    - 1.6 [StaticPods](#staticpods)
     - 
 - 2 [Scheduling](#Scheduling)
     - 2.1 [Taints](#taints)
@@ -256,5 +257,17 @@ When a container exceeds its memory limit in Kubernetes, it is terminated and re
 which stands for Out Of Memory Killed. This happens when a container or a pod consumes all the available memory resources allocated to it, 
 and the kernel terminates it to prevent it from consuming more memory and impacting the stability of the node. It is important to properly
 configure memory limits for containers and pods to avoid OOMKilled events, as they can lead to degraded performance and downtime.
+
+### staticpods
+
+```
+Static pods in Kubernetes are created and managed directly by the kubelet service on a node, without the need for a Kubernetes API server.
+The staticPodPath configuration setting specifies the directory path where the kubelet service should look for static pod manifests.
+Although static pods cannot be managed from the Kubernetes API server, they can be retrieved using the kubectl get pods command. To modify
+a static pod, we must edit the pod definition file on the node where the pod is running.
+```
+
+![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/c24e7f5f-fffe-4946-9c06-212f8c859291)
+
 
 
