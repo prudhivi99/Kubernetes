@@ -13,6 +13,9 @@
     - 2.1 [Taints](#taints)
     - 2.2 [Tolerations](#tolerations)
     - 2.3 [NodeAffinity](#nodeaffinity)
+- 3 [RequestsAndLimits](#RequestsAndLimits)
+    - 3.1 [RequestsAndLimits](#RequestsAndLimits)
+  
 
 ## 1 Objects
 ### DaemonSets
@@ -173,4 +176,85 @@ spec:
       securityContext: {}
       terminationGracePeriodSeconds: 30
 ```
+### RequestsAndLimits
+
+```
+Kubernetes uses YAML files to specify resource requirements for pods and containers, including CPU and memory resources.
+CPU resources are allocated using CPU requests and CPU limits in millicores. If a container exceeds the CPU limit, it
+will be throttled by the kernel. Memory resources are allocated using memory requests and memory limits in units such as
+bytes, kilobytes, megabytes, or gigabytes. If a container exceeds its memory limit, Kubernetes will terminate and restart
+it, which is known as an OOMKilled event. Properly configuring memory limits is important to avoid degraded performance and
+downtime.
+```
+
+![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/9b6d3437-ad6f-43c6-aded-a63c0fd3c9de)
+
+Resource requirements for pods and containers in Kubernetes can be specified in the YAML file. Kubernetes uses this information to 
+schedule and manage the deployment of the pod or container across the available nodes in the cluster.
+
+CPU Resources
+In Kubernetes, CPU resources can be allocated to Pods and containers to ensure that they have the required processing power to run 
+their applications. CPU resources are defined using the CPU resource units (millicores or milliCPU) and can be specified as CPU 
+requests and CPU limits.
+
+CPU Requests and Limits with YAML
+pod.yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: my-image
+    resources:
+      requests:
+        cpu: "100m"
+      limits:
+        cpu: "200m"
+```
+This example specifies a pod with a single container that has a CPU request of 100 millicores (100m) and a CPU limit of 200 millicores (200m):
+
+Impact of Exceeding CPU Limits
+If a container tries to exceed its CPU request, it will be scheduled on a node that has enough CPU resources to satisfy the request. However, 
+if a container tries to exceed its CPU limit, it will be throttled by the kernel. This can cause the container to become unresponsive, 
+leading to degraded performance and potentially impacting other containers running on the same node.
+
+Memory Resources
+In Kubernetes, memory resources can be allocated to Pods and containers to ensure that they have the required memory to run their applications. 
+Memory resources are defined using the memory resource units (such as bytes, kilobytes, megabytes, or gigabytes) and can be specified as memory
+requests and memory limits.
+
+Memory Requests and Limits with YAML
+pod.yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: my-image
+    resources:
+      requests:
+        memory: "64Mi"
+      limits:
+        memory: "128Mi"
+```
+
+This example specifies a pod with a single container that has a memory request of 64 megabytes (64Mi) and a memory limit of 128 megabytes (128Mi).
+
+Impact of Exceeding Memory Limits
+
+![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/2648babf-b291-4367-806f-d6e1e1f0dadb)
+
+When a container exceeds its memory limit in Kubernetes, it is terminated and restarted by Kubernetes. This event is known as OOMKilled, 
+which stands for Out Of Memory Killed. This happens when a container or a pod consumes all the available memory resources allocated to it, 
+and the kernel terminates it to prevent it from consuming more memory and impacting the stability of the node. It is important to properly
+configure memory limits for containers and pods to avoid OOMKilled events, as they can lead to degraded performance and downtime.
+
 
