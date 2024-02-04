@@ -17,14 +17,12 @@
 ## 1 Objects
 ### DaemonSets
 
-```
 ![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/aeb1be1d-a29d-4a59-8258-0946a512ebc5)
 
 ![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/af475caa-7cbb-4c72-8a7a-f24f1afb3ad3)
 
 ![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/5e3adf92-8f50-4e1f-88aa-ebf15ceca840)
 
-```
 
 ## 2 Scheduling
 ### taints
