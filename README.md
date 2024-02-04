@@ -57,4 +57,40 @@ status: {}
 Q. Remove the taint on controlplane, which currently has the taint effect of NoSchedule
 kubectl taint node controlplane node-role.kubernetes.io/control-plane:NoSchedule-
 ```
+### nodeaffinity
 
+```
+Node Affinity
+Node affinity is a set of rules the Kubernetes scheduler uses to determine where a pod can be placed. It is similar to
+the nodeSelector parameter but offers more flexibility and functionality.
+
+How it Works
+Node affinity in Kubernetes enables users to constrain which nodes a pod can be scheduled onto using labels on the nodes
+and label selectors specified in the pods. Kubernetes supports two types of node affinities:
+
+Required (requiredDuringSchedulingIgnoredDuringExecution): This enforces that the rule must be met for a pod to be scheduled
+onto a node. If no node meets the requirement, the pod will not be scheduled.
+Preferred (preferredDuringSchedulingIgnoredDuringExecution): This specifies that the Kubernetes scheduler will try to enforce the rules but does not guarantee the placement.
+These affinities are specified in the pod specification using the .spec.affinity.nodeAffinity field.
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: In
+            values:
+            - ssd            
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+```
