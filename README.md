@@ -16,6 +16,8 @@
     - 2.3 [NodeAffinity](#nodeaffinity)
 - 3 [RequestsAndLimits](#RequestsAndLimits)
     - 3.1 [RequestsAndLimits](#RequestsAndLimits)
+- 4 [ClusterMaintenance](#ClusterMaintenance)
+    - 3.1 [RequestsAndLimits](#RequestsAndLimits)
   
 
 ## 1 Objects
@@ -269,5 +271,27 @@ a static pod, we must edit the pod definition file on the node where the pod is 
 
 ![image](https://github.com/prudhivi99/Kubernetes/assets/63187046/c24e7f5f-fffe-4946-9c06-212f8c859291)
 
+
+### ClusterMaintenance
+
+```
+Q. We need to take node01 out for maintenance. Empty the node of all applications and mark it unschedulable.
+
+kubectl drain node01 --ignore-daemonsets
+```
+
+```
+Q. The maintenance tasks have been completed. Configure the node node01 to be schedulable again.
+
+kubectl uncordon node01
+
+After uncordon command, erlier pods it won't come back, only if we are creating new pods those will come.
+```
+```
+Q. Mark node01 as unschedulable so that no new pods are scheduled on this node.
+
+controlplane ~ ➜  kubectl cordon node01
+node/node01 cordoned
+```
 
 
