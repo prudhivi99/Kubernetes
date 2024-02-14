@@ -397,11 +397,9 @@ Since our ETCD database is TLS-Enabled, the following options are mandatory:
 –key                  identify secure client using this TLS key file
 
 ```
-
-```
-
 ### etcd
 
+```
 Q. What is the version of etcd running on the cluster ?
 
 controlplane ~ ➜  kubectl get pods -n kube-system
