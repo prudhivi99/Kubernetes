@@ -19,6 +19,8 @@
 - 4 [ClusterMaintenance](#ClusterMaintenance)
     - 4.1 [Maintenance](#Maintenance)
     - 4.2 [ClusterUpgrade](#ClusterUpgrade)
+    - 4.3 [ETCDTL](#etcdtl)
+    - 4.4 [ETCD](#etcd)
   
 
 ## 1 Objects
@@ -369,6 +371,102 @@ apt-mark unhold kubeadm && apt-get update && apt-get install -y kubeadm=1.27.0-0
 https://v1-28.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
 
 ```
+
+### ETCDTL
+
+```
+etcdctl is a command line client for etcd.
+
+export ETCDCTL_API=3
+
+```
+
+```
+For example, if you want to take a snapshot of etcd, use:
+
+etcdctl snapshot save -h and keep a note of the mandatory global options.
+
+Since our ETCD database is TLS-Enabled, the following options are mandatory:
+
+–cacert                verify certificates of TLS-enabled secure servers using this CA bundle
+
+–cert                    identify secure client using this TLS certificate file
+
+–endpoints=[127.0.0.1:2379] This is the default as ETCD is running on master node and exposed on localhost 2379.
+
+–key                  identify secure client using this TLS key file
+
+```
+
+```
+
+### etcd
+
+Q. What is the version of etcd running on the cluster ?
+
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-5d78c9869d-qqcmm               1/1     Running   0          4m30s
+coredns-5d78c9869d-zp4wb               1/1     Running   0          4m30s
+etcd-controlplane                      1/1     Running   0          4m43s
+kube-apiserver-controlplane            1/1     Running   0          4m45s
+kube-controller-manager-controlplane   1/1     Running   0          4m41s
+kube-proxy-gfh9j                       1/1     Running   0          4m30s
+kube-scheduler-controlplane            1/1     Running   0          4m41s
+
+controlplane ~ ➜  cd /etc/kubernetes/manifests/
+
+controlplane /etc/kubernetes/manifests ➜  ls
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+
+controlplane /etc/kubernetes/manifests ➜  vim etcd.yaml
+
+```
+
+```
+Q. if etcdctl command is not worked ?
+
+controlplane /etc/kubernetes/manifests ➜  etcdctl snapshot
+No help topic for 'snapshot'
+
+controlplane /etc/kubernetes/manifests ✖ 
+
+controlplane /etc/kubernetes/manifests ✖ 
+
+controlplane /etc/kubernetes/manifests ✖ ETCDCTL_API=3 etcdctl snapshot
+
+```
+
+```
+controlplane /etc/kubernetes/manifests ➜  export ETCDCTL_API=3
+
+controlplane /etc/kubernetes/manifests ✖ etcdctl snapshot
+NAME:
+
+```
+
+```
+Q. Take a snapshot of the ETCD database using the built-in snapshot functionality.
+   Store the backup file at location /opt/snapshot-pre-boot.db
+
+
+controlplane /etc/kubernetes/manifests ✖ etcdctl snapshot save --endpoints=127.0.0.1:2379  \
+--cacert=/etc/kubernetes/pki/etcd/ca.crt \
+--cert=/etc/kubernetes/pki/etcd/server.crt \
+--key=/etc/kubernetes/pki/etcd/server.key /opt/snapshot-pre-boot.db
+Snapshot saved at /opt/snapshot-pre-boot.db
+
+controlplane /etc/kubernetes/manifests ➜  ls /opt/snapshot-pre-boot.db
+/opt/snapshot-pre-boot.db
+
+```
+
+
+
+
+
+
+
 
 
 
