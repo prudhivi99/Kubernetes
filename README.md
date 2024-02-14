@@ -17,7 +17,8 @@
 - 3 [RequestsAndLimits](#RequestsAndLimits)
     - 3.1 [RequestsAndLimits](#RequestsAndLimits)
 - 4 [ClusterMaintenance](#ClusterMaintenance)
-    - 3.1 [RequestsAndLimits](#RequestsAndLimits)
+    - 4.1 [Maintenance](#Maintenance)
+    - 4.2 [ClusterUpgrade](#ClusterUpgrade)
   
 
 ## 1 Objects
@@ -293,5 +294,84 @@ Q. Mark node01 as unschedulable so that no new pods are scheduled on this node.
 controlplane ~ ➜  kubectl cordon node01
 node/node01 cordoned
 ```
+
+### ClusterUpgrade
+
+```
+Q. How to get current version of cluster
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   33m   v1.26.0
+node01         Ready    <none>          32m   v1.26.0
+```
+```
+Q. You are tasked to upgrade the cluster. Users accessing the applications must not be impacted, and you cannot provision new VMs. What strategy would you use to upgrade the cluster?
+
+upgrade one node at a time
+```
+
+```
+Q. What is the latest stable version of Kubernetes as of today?
+
+Look at the remote version in the output of the kubeadm upgrade plan command.
+```
+```
+Q. We will be upgrading the controlplane node first. Drain the controlplane node of workloads and mark it UnSchedulable ?
+
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   47m   v1.26.0
+node01         Ready    <none>          46m   v1.26.0
+
+controlplane ~ ✖ kubectl drain controlplane --ignore-daemonsets
+node/controlplane already cordoned
+
+first we need to drain/cordon then we need to upgrade 
+
+```
+
+```
+Q. How to upgrade controlplane node and worker nodes ?
+
+https://v1-28.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/
+
+to upgrade worker node
+
+https://v1-28.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/#upgrade-worker-nodes
+```
+
+```
+Q. Mark the controlplane node as "Schedulable" again ? After upgrade control plane should be available .
+
+controlplane ~ ➜  kubectl uncordon controlplane
+node/controlplane uncordoned
+
+controlplane ~ ➜  kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   78m   v1.27.0
+node01         Ready    <none>          78m   v1.26.0
+```
+
+```
+Q. Drain the worker node of the workloads and mark it UnSchedulable
+
+controlplane ~ ➜  kubectl drain node01
+node/node01 cordoned
+```
+
+```
+Q. Upgrade the worker node to the exact version v1.27.0
+
+first you need to login into ssh node01, most of the people will execute from controlplane node, you will ended up with faulty result.
+
+apt-mark unhold kubeadm && apt-get update && apt-get install -y kubeadm=1.27.0-00 && apt-mark hold kubeadm
+
+https://v1-28.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
+
+```
+
+
+
+
 
 
