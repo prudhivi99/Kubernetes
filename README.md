@@ -21,6 +21,9 @@
     - 4.2 [ClusterUpgrade](#ClusterUpgrade)
     - 4.3 [ETCDTL](#etcdtl)
     - 4.4 [ETCD](#etcd)
+- 5 [Security](#Security)
+    - 5.1 [Kubeconfig](#Kubeconfig)
+    - 5.2 
   
 
 ## 1 Objects
@@ -555,7 +558,97 @@ spec:
 status: {}
 ```
 
+```yaml
+Q. How to show/view configured clusters ?
 
+student-node ~ ✖ kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://cluster1-controlplane:6443
+  name: cluster1
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://192.35.127.6:6443
+  name: cluster2
+contexts:
+- context:
+    cluster: cluster1
+    user: cluster1
+  name: cluster1
+- context:
+    cluster: cluster2
+    user: cluster2
+  name: cluster2
+current-context: cluster1
+kind: Config
+preferences: {}
+users:
+- name: cluster1
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+- name: cluster2
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+```
+
+```
+How many nodes (both controlplane and worker) are part of cluster1?
+
+Make sure to switch the context to cluster1:
+
+kubectl config use-context cluster1
+
+```
+
+```
+Q. How to find which  ETCD configured for cluster1?
+
+kubectl config use-context cluster1
+
+kubectl describe pod kube-apiserver-cluster1-controlplane -n kube-system
+
+--etcd-servers=https://127.0.0.1:2379
+
+In Api server if it is configured local host, then it should be a local/stacked etcd
+
+```
+
+```
+Q. How many nodes are part of the ETCD cluster that etcd-server is a part of?
+
+etcd-server ~ ✖ etcdctl --endpoints=https://192.35.127.18:2379 --cacert=/etc/etcd/pki/ca.pem --cert=/etc/etcd/pki/etcd.pem --key=/etc/etcd/pki/etcd-key.pem member list
+
+
+3c219a26b410bb54, started, etcd-server, https://192.35.127.18:2380, https://192.35.127.18:2379, false
+
+```
+
+### Kubeconfig
+
+```
+Q. Where will be the kubeconfig located ?
+
+controlplane ~ ✖ cat /root/.kube/config
+```
+
+```
+Q. How to use custom kubeconfig file ?
+
+controlplane ~ ➜  kubectl config use-context research --kubeconfig /root/my-kube-config
+Switched to context "research".
+
+```
+
+```
+Q. Set the my-kube-config file as the default kubeconfig by overwriting the content of ~/.kube/config with the content of the my-kube-config file.
+
+ mv /root/my-kube-config /root/.kube/config
+
+```
 
 
 
