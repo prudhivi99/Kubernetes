@@ -23,7 +23,7 @@
     - 4.4 [ETCD](#etcd)
 - 5 [Security](#Security)
     - 5.1 [Kubeconfig](#Kubeconfig)
-    - 5.2 
+    - 5.2 [RoleBasedAccessControl](#RoleBasedAccessControl)
   
 
 ## 1 Objects
@@ -650,8 +650,79 @@ Q. Set the my-kube-config file as the default kubeconfig by overwriting the cont
 
 ```
 
+### RoleBasedAccessControl
 
+```
+Q. Inspect the environment and identify the authorization modes configured on the cluster.
+Check the kube-apiserver settings.
 
+- --authorization-mode=Node,RBAC
+```
+
+```yaml
+example file of RBAC role 
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: "2024-02-16T15:43:52Z"
+  name: kube-proxy
+  namespace: kube-system
+  resourceVersion: "263"
+  uid: 3244c5a7-d457-4542-9b98-5c5052c10d0b
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - kube-proxy
+  resources:
+  - configmaps
+  verbs:
+  - get
+```
+
+```yaml
+Q. Create the necessary roles and role bindings required for the dev-user to create, list and delete pods in the default namespace.
+
+kubectl create role developer --verb=create --verb=delete  --resource=pods
+kubectl create rolebinding dev-user-binding --role=developer --user=dev-user
+
+```
+
+```
+Q. Add a new rule in the existing role developer to grant the dev-user permissions to create deployments in the blue namespace.
+Remember to add api group "apps".
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: "2024-02-16T15:51:13Z"
+  name: developer
+  namespace: blue
+  resourceVersion: "4479"
+  uid: 85a80cea-d679-4646-aaeb-13ae49865866
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - dark-blue-app
+  resources:
+  - pods
+  verbs:
+  - get
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployment
+  verbs:
+  - get
+  - watch
+  - create
+  - delete
+```
 
 
 
