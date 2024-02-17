@@ -1417,4 +1417,29 @@ status:
     - ip: 10.108.28.44
 ```
 
+```
+Q. You are requested to make the new application available at /pay.
+Identify and implement the best approach to making this application available on the ingress controller and
+test to make sure its working. Look into annotations: rewrite-target as well.
+
+
+Ingress Created
+Path: /pay
+Configure correct backend service
+Configure correct backend port
+
+controlplane ~ ➜  k get service -n critical-space
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+pay-service   ClusterIP   10.108.226.143   <none>        8282/TCP   5m30s
+
+controlplane ~ ➜  k edit service -n critical-space
+Edit cancelled, no changes made.
+
+controlplane ~ ➜  k get service -n ceritical-space^C
+
+controlplane ~ ✖ kubectl create ingress ingress-pay -n critical-space --rule="/pay=pay-service:8282"
+ingress.networking.k8s.io/ingress-pay created
+
+```
+
 
