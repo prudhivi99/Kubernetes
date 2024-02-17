@@ -24,6 +24,8 @@
 - 5 [Security](#Security)
     - 5.1 [Kubeconfig](#Kubeconfig)
     - 5.2 [RoleBasedAccessControl](#RoleBasedAccessControl)
+    - 5.3 [ClusterRoles](#ClusterRoles)
+    - 
   
 
 ## 1 Objects
@@ -723,6 +725,59 @@ rules:
   - create
   - delete
 ```
+
+### ClusterRoles
+
+ClusterRoles are cluster wide and not part of any specific namespace.
+
+
+```
+Q. A new user michelle joined the team. She will be focusing on the nodes in the cluster. Create the required ClusterRoles and ClusterRoleBindings so she gets access to the nodes.
+
+controlplane ~ ➜  kubectl get nodes --as michelle
+Error from server (Forbidden): nodes is forbidden: User "michelle" cannot list resource "nodes" in API group "" at the cluster scope
+
+controlplane ~ ➜  kubectl create clusterrole michelle --verb=get,list,watch --resource=nodes
+clusterrole.rbac.authorization.k8s.io/michelle created
+
+controlplane ~ ➜  kubectl create clusterrolebinding michelle-binding --clusterrole=michelle --user=michelle 
+clusterrolebinding.rbac.authorization.k8s.io/michelle-binding created
+
+```
+
+```
+Q. How to list all resources
+
+kubectl api-resources
+
+```
+
+```
+Q. michelle's responsibilities are growing and now she will be responsible for storage as well. Create the required ClusterRoles and ClusterRoleBindings to allow her access to Storage.
+Get the API groups and resource names from command kubectl api-resources. Use the given spec:
+
+ClusterRole: storage-admin
+
+Resource: persistentvolumes
+
+Resource: storageclasses
+
+ClusterRoleBinding: michelle-storage-admin
+
+ClusterRoleBinding Subject: michelle
+
+ClusterRoleBinding Role: storage-admin
+
+kubectl create clusterrole storage-admin --verb=get,list,watch --resource=persistentvolumes,storageclasses
+clusterrole.rbac.authorization.k8s.io/storage-admin created
+
+kubectl create clusterrolebinding michelle-storage-admin --clusterrole=storage-admin --user=michelle 
+clusterrolebinding.rbac.authorization.k8s.io/michelle-storage-admin created
+
+```
+
+
+
 
 
 
