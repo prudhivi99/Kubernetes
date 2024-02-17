@@ -29,6 +29,12 @@
     - 5.5 [ImageSecurity](#ImageSecurity)
     - 5.6 [SecurityContexts](#SecurityContexts)
     - 5.7 [NetworkPolicies](#NetworkPolicies)
+- 6 [Storage](#Storage)
+    - 6.1 [Storage](#Storage)
+    - 6.2 [PersistentVolume](#PersistentVolume)
+    - 6.3 [PersistentVolumeClaim](#PersistentVolumeClaim)
+    - 6.4 [StorageClasses](#StorageClasses)
+  
   
 
 ## 1 Objects
@@ -950,6 +956,150 @@ spec:
           port: 3306
 ```
 
+### Storage
+
+Once you create a PVC use it in a POD definition file by specifying the PVC Claim name under persistentVolumeClaim section in the volumes section like this:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+```
+
+```yaml
+Q. Configure a volume to store these logs at /var/log/webapp on the host.
+
+Configure a volume to store these logs at /var/log/webapp on the host.
+Name: webapp
+Image Name: kodekloud/event-simulator
+Volume HostPath: /var/log/webapp
+Volume Mount: /log
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-02-17T07:55:12Z"
+  name: webapp
+  namespace: default
+  resourceVersion: "841"
+  uid: b142f6b3-b9f4-4ec7-ba85-8d7d5f51844c
+spec:
+  containers:
+  - env:
+    - name: LOG_HANDLERS
+      value: file
+    image: kodekloud/event-simulator
+    imagePullPolicy: Always
+    name: event-simulator
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-kcvsn
+      readOnly: true
+    - mountPath: /log
+      name: vol
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  volumes:
+  - name: vol
+    hostPath:
+      path: /var/log/webapp
+
+```
+
+```
+Q. Create a Persistent Volume with the given specification.
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv/log
+```
+
+```
+If access modes are miss match, then pv & pvc are not binding with each other.
+```
+
+```yaml
+Q. Let's fix that. Create a new PersistentVolumeClaim by the name of local-pvc that should bind to the volume local-pv.
+Inspect the pv local-pv for the specs.
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: local-storage
+```
+
+```yaml
+Q. Create a new pod called nginx with the image nginx:alpine. The Pod should make use of the PVC local-pvc and mount the volume at the path /var/www/html.
+The PV local-pv should be in a bound state.
+
+Pod created with the correct Image?
+Pod uses PVC called local-pvc?
+local-pv bound?
+nginx pod running?
+Volume mounted at the correct path?
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: local-pvc
+```
+
+```yaml
+Q. Create a new Storage Class called delayed-volume-sc that makes use of the below specs:
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: delayed-volume-sc
+provisioner: kubernetes.io/no-provisioner
+parameters:
+  type: pd-standard
+volumeBindingMode: WaitForFirstConsumer
+```
 
 
 
