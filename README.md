@@ -40,6 +40,7 @@
     - 7.3 [NetworkWeaving](#NetworkWeaving)
     - 7.4 [ServiceNetworking](#ServiceNetworking)
 
+
   
   
 
@@ -1175,6 +1176,7 @@ default via 172.25.0.1 dev eth1
 192.19.185.0/24 dev eth0 proto kernel scope link src 192.19.185.11
 ```
 
+
 ## CNIWeave
 
 ```
@@ -1313,6 +1315,66 @@ Inspect the kube-proxy pods and try to identify how they are deployed
 using deamonset
 ```
 
+```yaml
+Q. We just deployed a web server - webapp - that accesses a database mysql - server. However the web server is failing to connect to the database server. Troubleshoot and fix the issue.
+They could be in different namespaces. First locate the applications. The web server interface can be seen by clicking the tab Web Server at the top of your terminal.
 
+controlplane ~ ➜  k describe deploy webapp
+Name:                   webapp
+Namespace:              default
+CreationTimestamp:      Sat, 17 Feb 2024 16:59:40 +0000
+Labels:                 name=webapp
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               name=webapp
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  name=webapp
+  Containers:
+   simple-webapp-mysql:
+    Image:      mmumshad/simple-webapp-mysql
+    Port:       8080/TCP
+    Host Port:  0/TCP
+    Environment:
+      DB_Host:      mysql
+      DB_User:      root
+      DB_Password:  paswrd
+    Mounts:         <none>
+  Volumes:          <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   webapp-b9548974b (1/1 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  5m10s  deployment-controller  Scaled up replica set webapp-b9548974b to 1
+
+
+controlplane ~ ➜  k get service -n payroll
+NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+mysql         ClusterIP   10.106.161.44   <none>        3306/TCP   7m44s
+web-service   ClusterIP   10.101.107.72   <none>        80/TCP     33m
+
+
+we have to correct DB_Host:      mysql.payroll
+
+```
+
+```
+Q. From the hr pod nslookup the mysql service and redirect the output to a file /root/CKA/nslookup.out
+
+controlplane ~ ✖ k exec hr -- nslookup mysql.payroll
+Server:         10.96.0.10
+Address:        10.96.0.10#53
+
+Name:   mysql.payroll.svc.cluster.local
+Address: 10.106.161.44
+```
 
 
