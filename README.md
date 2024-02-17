@@ -38,6 +38,7 @@
     - 7.1 [CoreDNS](#CoreDNS)
     - 7.2 [CNIWeave](#CNIWeave)
     - 7.3 [NetworkWeaving](#NetworkWeaving)
+    - 7.4 [ServiceNetworking](#ServiceNetworking)
 
   
   
@@ -1254,11 +1255,63 @@ Q. How to deploy pod on particular node ?
 nodeName : node01
 nodeName : controlplane
 ```
+## ServiceNetworking
+
+```
+Q. What network range are the nodes in the cluster part of?
+
+controlplane ~ ➜  kubectl get nodes -o wide
+NAME           STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION   CONTAINER-RUNTIME
+controlplane   Ready    control-plane   69m   v1.29.0   192.24.117.3   <none>        Ubuntu 22.04.3 LTS   5.4.0-1106-gcp   containerd://1.6.26
+node01         Ready    <none>          68m   v1.29.0   192.24.117.6   <none>        Ubuntu 22.04.3 LTS   5.4.0-1106-gcp   containerd://1.6.26
 
 
+7757: eth0@if7758: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default 
+    link/ether 02:42:c0:18:75:03 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.24.117.3/24 brd 192.24.117.255 scope global eth0
+```
 
+```
+Q. What is the range of IP addresses configured for PODs on this cluster?
 
+controlplane ~ ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS      AGE
+coredns-69f9c977-4vxwj                 1/1     Running   0             71m
+coredns-69f9c977-744dk                 1/1     Running   0             71m
+etcd-controlplane                      1/1     Running   0             71m
+kube-apiserver-controlplane            1/1     Running   0             71m
+kube-controller-manager-controlplane   1/1     Running   0             71m
+kube-proxy-75kbj                       1/1     Running   0             71m
+kube-proxy-s2dvh                       1/1     Running   0             71m
+kube-scheduler-controlplane            1/1     Running   0             71m
+weave-net-856qp                        2/2     Running   0             71m
+weave-net-f45k6                        2/2     Running   1 (71m ago)   71m
 
+controlplane ~ ➜  kubectl logs weave-net-856qp -n kube-system
+Defaulted container "weave" out of: weave, weave-npc, weave-init (init)
+INFO: 2024/02/17 15:05:59.553607 Command line options: map[conn-limit:200 datapath:datapath db-prefix:/weavedb/weave-net docker-api: expect-npc:true http-addr:127.0.0.1:6784 ipalloc-init:consensus=1 ipalloc-range:10.244.0.0/16 metrics-addr:0.0.0.0:6782 name:36:e1:c5:93:9b:47 nickname:node01 no-dns:true no-masq-local:true port:6783]
+```
+
+```
+Q. What is the IP Range configured for the services within the cluster?
+
+controlplane ~ ➜  cd /etc/kubernetes/manifests/
+
+controlplane /etc/kubernetes/manifests ➜  ls
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+
+controlplane /etc/kubernetes/manifests ➜  cat kube-apiserver.yaml
+
+ - --service-cluster-ip-range=10.96.0.0/12
+    - --tls-cert-file=/etc/kubernetes/pki/apiserver.crt
+```
+
+```
+Q. How does this Kubernetes cluster ensure that a kube-proxy pod runs on all nodes in the cluster?
+Inspect the kube-proxy pods and try to identify how they are deployed
+
+using deamonset
+```
 
 
 
