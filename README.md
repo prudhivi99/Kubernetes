@@ -43,10 +43,6 @@
  
 
 
-
-  
-  
-
 ## 1 Objects
 ### DaemonSets
 
@@ -1378,6 +1374,47 @@ Address:        10.96.0.10#53
 
 Name:   mysql.payroll.svc.cluster.local
 Address: 10.106.161.44
+```
+
+## Ingress
+
+
+example
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2024-02-17T18:27:12Z"
+  generation: 2
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "1639"
+  uid: 5a7e7911-5766-4367-9ce4-f7bb36a0df10
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.108.28.44
 ```
 
 
