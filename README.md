@@ -1107,6 +1107,20 @@ If pvc is deleted and what happend to pv ?
 pv is not deleted , but it won't be available
 ```
 
+```
+Q. what is pvc is trying to delete, but still attached to POD ?
+
+pvc will be strucked , becaused pod is still using pvc
+
+```
+
+```
+Q. what is pod deleted , what happend to associated to pv,pvcs ?
+
+pvc also will be deleted, but pv will be relased state
+```
+
+
 
 
 
