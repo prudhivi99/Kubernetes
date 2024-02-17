@@ -34,6 +34,11 @@
     - 6.2 [PersistentVolume](#PersistentVolume)
     - 6.3 [PersistentVolumeClaim](#PersistentVolumeClaim)
     - 6.4 [StorageClasses](#StorageClasses)
+- 7 [Networking](#Networking)
+    - 7.1 [CoreDNS](#CoreDNS)
+    - 7.2 [CNIWeave](#CNIWeave)
+    - 7.3 [NetworkWeaving](#NetworkWeaving)
+
   
   
 
@@ -1119,6 +1124,138 @@ Q. what is pod deleted , what happend to associated to pv,pvcs ?
 
 pvc also will be deleted, but pv will be relased state
 ```
+
+## Networking
+
+### CoreDNS
+
+```
+Q.What is the network interface configured for cluster connectivity on the controlplane node?
+  node-to-node communication
+
+controlplane ~ ➜  k get nodes -o wide
+NAME           STATUS   ROLES           AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION   CONTAINER-RUNTIME
+controlplane   Ready    control-plane   13m   v1.29.0   192.19.185.11   <none>        Ubuntu 22.04.3 LTS   5.4.0-1106-gcp   containerd://1.6.26
+
+Need find the ipaddress linked interface, for the we can use below commands.
+
+ip addr
+ip link
+
+5: veth11044351@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master cni0 state UP group default 
+    link/ether 12:d0:c2:d1:23:aa brd ff:ff:ff:ff:ff:ff link-netns cni-25862dfb-303a-76c7-9b24-b770dbd38e3e
+6016: eth0@if6017: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default 
+    link/ether 02:42:c0:13:b9:0b brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.19.185.11/24 brd 192.19.185.255 scope global eth0
+       valid_lft forever preferred_lft forever
+
+192.19.185.11 is linked to eth0
+```
+
+```
+Q. We use Containerd as our container runtime. What is the interface/bridge created by Containerd on the controlplane node?
+
+controlplane ~ ✖ ip address show type bridge 
+3: cni0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default qlen 1000
+    link/ether de:ec:79:a6:a6:b0 brd ff:ff:ff:ff:ff:ff
+    inet 10.244.0.1/24 brd 10.244.0.255 scope global cni0
+       valid_lft forever preferred_lft forever
+```
+
+```
+Q. If you were to ping google from the controlplane node, which route does it take?
+   What is the IP address of the Default Gateway?
+
+controlplane ~ ➜  ip route
+default via 172.25.0.1 dev eth1 
+10.244.0.0/24 dev cni0 proto kernel scope link src 10.244.0.1 
+10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink 
+172.25.0.0/24 dev eth1 proto kernel scope link src 172.25.0.4 
+192.19.185.0/24 dev eth0 proto kernel scope link src 192.19.185.11
+```
+
+## CNIWeave
+
+```
+Weave provides the virtual networking infrastructure necessary for containers to talk to each other
+```
+/opt/cni/bin   -> in this path cni bin's are available
+
+## NetworkWeaving
+
+```
+Q. What is the Networking Solution used by this cluster?
+
+controlplane ~ ➜  cd /etc/cni/net.d/
+
+controlplane /etc/cni/net.d ➜  ls
+10-weave.conflist
+
+controlplane /etc/cni/net.d ➜  cat 10-weave.conflist 
+{
+    "cniVersion": "0.3.0",
+    "name": "weave",
+    "plugins": [
+        {
+            "name": "weave",
+            "type": "weave-net",
+            "hairpinMode": true
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}
+
+```
+
+```
+Q. How many weave agents/peers are deployed in this cluster?
+
+2
+
+controlplane /etc/cni/net.d ➜  kubectl get pods -n kube-system
+NAME                                   READY   STATUS    RESTARTS      AGE
+coredns-69f9c977-np4fw                 1/1     Running   0             65m
+coredns-69f9c977-sc9qz                 1/1     Running   0             65m
+etcd-controlplane                      1/1     Running   0             65m
+kube-apiserver-controlplane            1/1     Running   0             65m
+kube-controller-manager-controlplane   1/1     Running   0             65m
+kube-proxy-ph6d2                       1/1     Running   0             65m
+kube-proxy-tnzzr                       1/1     Running   0             64m
+kube-scheduler-controlplane            1/1     Running   0             65m
+weave-net-dcc6s                        2/2     Running   1 (65m ago)   65m
+weave-net-g5rs6                        2/2     Running   0             64m
+```
+
+```
+Q. What is the POD IP address range configured by weave?
+
+controlplane /etc/cni/net.d ➜  kubectl logs weave-net-dcc6s -n kube-system
+Defaulted container "weave" out of: weave, weave-npc, weave-init (init)
+DEBU: 2024/02/17 14:02:08.600857 [kube-peers] Checking peer "52:23:22:81:a5:55" against list &{[]}
+Peer not in list; removing persisted data
+INFO: 2024/02/17 14:02:08.725533 Command line options: map[conn-limit:200 datapath:datapath db-prefix:/weavedb/weave-net docker-api:
+expect-npc:true http-addr:127.0.0.1:6784 ipalloc-init:consensus=0 ipalloc-range:10.244.0.0/16 metrics-addr:0.0.0.0:6782 name:52:23:22:81:a5:55
+ nickname:controlplane no-dns:true no-masq-local:true port:6783]
+
+```
+
+```
+Q. What is the default gateway configured on the PODs scheduled on node01?
+Try scheduling a pod on node01 and check ip route output
+```
+
+```
+Q. How to deploy pod on particular node ?
+
+nodeName : node01
+nodeName : controlplane
+```
+
+
 
 
 
