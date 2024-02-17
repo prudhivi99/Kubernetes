@@ -25,7 +25,7 @@
     - 5.1 [Kubeconfig](#Kubeconfig)
     - 5.2 [RoleBasedAccessControl](#RoleBasedAccessControl)
     - 5.3 [ClusterRoles](#ClusterRoles)
-    - 
+    - 5.4 [ServiceAccounts](#ServiceAccounts)
   
 
 ## 1 Objects
@@ -776,6 +776,29 @@ clusterrolebinding.rbac.authorization.k8s.io/michelle-storage-admin created
 
 ```
 
+### ServiceAccounts
+
+```
+controlplane ~ ➜  kubectl get serviceaccount
+NAME      SECRETS   AGE
+default   0         22m
+dev       0         38s
+```
+```
+Association with pod and service account
+
+controlplane ~ ➜  kubectl describe pod web-dashboard-74cbcd9494-bqq65
+Name:             web-dashboard-74cbcd9494-bqq65
+Namespace:        default
+Priority:         0
+Service Account:  default
+```
+
+```
+To do this, run kubectl create token dashboard-sa for the dashboard-sa service account, copy the token and paste it in the UI.
+
+kubectl create token dashboard-sa
+```
 
 
 
