@@ -1101,6 +1101,11 @@ parameters:
 volumeBindingMode: WaitForFirstConsumer
 ```
 
+```
+If pvc is deleted and what happend to pv ?
+
+pv is not deleted , but it won't be available
+```
 
 
 
