@@ -26,6 +26,9 @@
     - 5.2 [RoleBasedAccessControl](#RoleBasedAccessControl)
     - 5.3 [ClusterRoles](#ClusterRoles)
     - 5.4 [ServiceAccounts](#ServiceAccounts)
+    - 5.5 [ImageSecurity](#ImageSecurity)
+    - 5.6 [SecurityContexts](#SecurityContexts)
+    - 
   
 
 ## 1 Objects
@@ -800,6 +803,85 @@ To do this, run kubectl create token dashboard-sa for the dashboard-sa service a
 kubectl create token dashboard-sa
 ```
 
+### ImageSecurity
+
+```
+root@controlplane ~ ➜  kubectl create secret
+Create a secret with specified type.
+
+ A docker-registry type secret is for accessing a container registry.
+
+ A generic type secret indicate an Opaque secret type.
+
+ A tls type secret holds TLS certificate and its associated key.
+
+Available Commands:
+  docker-registry   Create a secret for use with a Docker registry
+  generic           Create a secret from a local file, directory, or literal value
+  tls               Create a TLS secret
+```
+
+```
+Q. Create a secret object with the credentials required to access the registry.
+
+
+Name: private-reg-cred
+Username: dock_user
+Password: dock_password
+Server: myprivateregistry.com:5000
+Email: dock_user@myprivateregistry.com
+
+root@controlplane ~ ➜  kubectl create secret docker-registry private-reg-cred --docker-server=myprivateregistry.com:5000 --docker
+-username=dock_user --docker-password=dock_password --docker-email=dock_user@myprivateregistry.com
+secret/private-reg-cred created
+
+```
+
+```
+Q. Configure the deployment to use credentials from the new secret to pull images from the private registry
+
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - image: myprivateregistry.com:5000/nginx:alpine
+        imagePullPolicy: IfNotPresent
+```
+
+### SecurityContexts
+
+```
+Q. What is the user used to execute the sleep process within the ubuntu-sleeper pod?
+
+controlplane ~ ✖ kubectl exec ubuntu-sleeper -- whoami
+root
+```
+
+```
+Q. Pod Name: ubuntu-sleeper
+Image Name: ubuntu
+SecurityContext: User 1010
+
+securityContext:
+    runAsUser: 1010
+```
+
+```yaml
+Q. Now update the pod to also make use of the NET_ADMIN capability.
+   Note: Only make the necessary changes. Do not modify the name of the pod.
+
+spec:
+  containers:
+  - command:
+    - sleep
+    - "4800"
+    image: ubuntu
+    imagePullPolicy: Always
+    name: ubuntu
+    securityContext:
+      capabilities:
+        add: ["SYS_TIME","NET_ADMIN"]
+```
 
 
 
