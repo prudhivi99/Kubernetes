@@ -40,6 +40,7 @@
     - 7.3 [NetworkWeaving](#NetworkWeaving)
     - 7.4 [ServiceNetworking](#ServiceNetworking)
     - 7.5 [Ingress](#Ingress)
+    - 7.6 [Difference between diff nodes & clusters](#Clusters)
  
 
 
@@ -1441,5 +1442,43 @@ controlplane ~ ✖ kubectl create ingress ingress-pay -n critical-space --rule="
 ingress.networking.k8s.io/ingress-pay created
 
 ```
+
+## clusters
+
+```
+student-node ~ ➜  k get nodes
+NAME                    STATUS   ROLES           AGE   VERSION
+cluster1-controlplane   Ready    control-plane   33m   v1.24.0
+cluster1-node01         Ready    <none>          32m   v1.24.0
+cluster1-node02         Ready    <none>          32m   v1.24.0
+
+student-node ~ ➜  kubectl config use-context cluster2
+Switched to context "cluster2".
+
+student-node ~ ➜  k get nodes
+NAME                    STATUS   ROLES           AGE   VERSION
+cluster2-controlplane   Ready    control-plane   33m   v1.24.0
+cluster2-node01         Ready    <none>          33m   v1.24.0
+
+student-node ~ ➜  kubectl config use-context cluster3
+Switched to context "cluster3".
+
+student-node ~ ➜  k get nodes
+NAME                    STATUS   ROLES                  AGE   VERSION
+cluster3-controlplane   Ready    control-plane,master   33m   v1.24.1+k3s1
+
+student-node ~ ➜  kubectl config use-context cluster4
+Switched to context "cluster4".
+
+student-node ~ ➜  k get nodes
+NAME                    STATUS   ROLES           AGE   VERSION
+cluster4-controlplane   Ready    control-plane   34m   v1.24.0
+cluster4-node01         Ready    <none>          33m   v1.24.0
+
+student-node ~ ➜
+
+```
+
+
 
 
